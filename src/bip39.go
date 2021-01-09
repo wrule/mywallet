@@ -75,30 +75,30 @@ func BIP39BytesAddCheckInfo(bytes []byte) []int {
 	return bits
 }
 
-// BIP39GetSeed 根据助记词列表和密码获取种子
+// BIP39GetSeed 根据助记词文本和密码获取种子
 func BIP39GetSeed(text string, pwd string) []byte {
 	return pbkdf2.Key([]byte(text), []byte("mnemonic"+pwd), 2048, 64, sha512.New)
 }
 
-// BIP39GetSeedByWords s
+// BIP39GetSeedByWords 根据助记词切片和密码获取种子
 func BIP39GetSeedByWords(words []string, pwd string) []byte {
 	return BIP39GetSeed(strings.Join(words, " "), pwd)
 }
 
-// NewBIP39ByWords 构造函数
+// NewBIP39ByWords 构造函数，从切片构造
 func NewBIP39ByWords(words []string) *BIP39 {
 	return &BIP39{
 		words: words,
 	}
 }
 
-// NewBIP39ByFile 构造函数
+// NewBIP39ByFile 构造函数，从文件构造
 func NewBIP39ByFile(filePath string) *BIP39 {
-	return NewBIP39ByWords(readWordList(filePath))
+	return NewBIP39ByWords(BIP39ReadWordList(filePath))
 }
 
-// readWordList 读取助记词词典列表
-func readWordList(filePath string) []string {
+// BIP39ReadWordList 从文件中读取助记词词典列表
+func BIP39ReadWordList(filePath string) []string {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		panic(err)
