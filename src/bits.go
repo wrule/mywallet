@@ -1,6 +1,6 @@
 package main
 
-// BytesToBits s
+// BytesToBits 字节切片转换为位切片
 func BytesToBits(bytes []byte) []int {
 	rst := []int{}
 	for _, item := range bytes {
@@ -12,13 +12,13 @@ func BytesToBits(bytes []byte) []int {
 	return rst
 }
 
-// BitsToBytes s
+// BitsToBytes 位切片转换为字节切片
 func BitsToBytes(bits []int) []byte {
 	rst := []byte{}
 	segNum := len(bits) / 8
 	modNum := len(bits) % 8
 	if modNum != 0 {
-		panic("位数不是8的倍数")
+		panic("位切片长度不是8的整数倍")
 	}
 	for i := 0; i < segNum; i++ {
 		start := i * 8
