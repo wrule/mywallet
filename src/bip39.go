@@ -76,8 +76,13 @@ func BIP39BytesAddCheckInfo(bytes []byte) []int {
 }
 
 // BIP39GetSeed 根据助记词列表和密码获取种子
-func BIP39GetSeed(words string, pwd string) []byte {
-	return pbkdf2.Key([]byte(words), []byte("mnemonic"+pwd), 2048, 64, sha512.New)
+func BIP39GetSeed(text string, pwd string) []byte {
+	return pbkdf2.Key([]byte(text), []byte("mnemonic"+pwd), 2048, 64, sha512.New)
+}
+
+// BIP39GetSeedByWords s
+func BIP39GetSeedByWords(words []string, pwd string) []byte {
+	return BIP39GetSeed(strings.Join(words, " "), pwd)
 }
 
 // NewBIP39ByWords 构造函数
