@@ -15,9 +15,8 @@ func main() {
 	bip39 := NewBIP39ByFile("bip39wordlist-en.txt")
 	words := bip39.GenerateWords(bytes)
 	fmt.Println(words)
-	seed := BIP39GetSeed("olympic hard body window sibling used only mimic put sad ability bone", "hellobtc")
+	seed := BIP39GetSeed(words, "")
 	fmt.Println(hex.EncodeToString(seed))
-
 	computerVoiceMasterKey, _ := bip32.NewMasterKey(seed)
 	fmt.Println(computerVoiceMasterKey.B58Serialize())
 }
