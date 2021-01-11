@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 
@@ -21,19 +19,13 @@ func main() {
 	seed := BIP39GetSeed(words, "")
 	fmt.Println(hex.EncodeToString(seed))
 
-	h := hmac.New(sha512.New, []byte("Bitcoin seed"))
-	h.Write(seed)
-	rst := h.Sum(nil)
-	fmt.Println(hex.EncodeToString(rst), len(rst))
-	keyBytes := rst[:32]
-	// codeBytes := rst[32:]
-
-	fmt.Println(base58.Encode(keyBytes))
-
 	computerVoiceMasterKey, _ := bip32.NewMasterKey(seed)
 	brst, err := computerVoiceMasterKey.Serialize()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(123, base58.Encode(brst))
+
+	b32 := NewRootPriKey(seed)
+	fmt.Println(b32.SerializeBase58())
 }
