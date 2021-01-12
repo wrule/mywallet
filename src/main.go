@@ -26,6 +26,6 @@ func main() {
 	}
 	fmt.Println(123, base58.Encode(brst))
 
-	b32 := NewRootPriKey(seed)
+	b32 := BIP32NewRootPriKey(seed)
 	fmt.Println(b32.SerializeBase58())
 }

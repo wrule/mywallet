@@ -20,7 +20,7 @@ type BIP32Key struct {
 	isPrivate   bool
 }
 
-// Serialize s
+// Serialize 字节序列化
 func (me *BIP32Key) Serialize() []byte {
 	buf := new(bytes.Buffer)
 	buf.Write(me.version)
@@ -39,24 +39,28 @@ func (me *BIP32Key) Serialize() []byte {
 	return rst
 }
 
-// SerializeBase58 s
+// SerializeBase58 字节序列化后转为base58编码
 func (me *BIP32Key) SerializeBase58() string {
 	return base58.Encode(me.Serialize())
 }
 
-// NewRootPriKey 构造函数
-func NewRootPriKey(seed []byte) *BIP32Key {
+// BIP32NewRootPriKey 构造函数，构造根私钥
+func BIP32NewRootPriKey(seed []byte) *BIP32Key {
 	rst := &BIP32Key{
 		isPrivate: true,
 	}
 	h := hmac.New(sha512.New, []byte("Bitcoin seed"))
-	h.Write(seed)
+	_, err := h.Write(seed)
+	if err != nil {
+		panic(err)
+	}
 	hrst := h.Sum(nil)
 	rst.version = []byte{0x04, 0x88, 0xad, 0xe4}
 	rst.depth = 0x00
 	rst.fingerPrint = []byte{0x00, 0x00, 0x00, 0x00}
 	rst.childNumber = []byte{0x00, 0x00, 0x00, 0x00}
 	rst.chainCode = hrst[32:]
+	// 需要校验？
 	rst.key = hrst[:32]
 	return rst
 }
