@@ -25,6 +25,7 @@ func main() {
 
 	myRootPriKey := BIP32NewRootPriKey(seed)
 	fmt.Println(myRootPriKey.SerializeBase58())
+	fmt.Println(myRootPriKey.PublicKey().SerializeBase58())
 
 	// b32 := BIP32NewRootPriKey(seed)
 	// fmt.Println(b32.SerializeBase58())
