@@ -30,7 +30,7 @@ func (me *BIP32PriKey) PublicKey() *BIP32PubKey {
 	pubKey := priKey.Public().(*ecdsa.PublicKey)
 	pubKeyBytes := crypto.FromECDSAPub(pubKey)[1:]
 
-	rst.BIP32KeyCom.key = pubKeyBytes
+	rst.BIP32KeyCom.key = append([]byte{0x03}, pubKeyBytes[:32]...)
 	rst.BIP32KeyCom.me = rst
 	return rst
 }

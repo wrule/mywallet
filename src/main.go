@@ -12,6 +12,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(hex.EncodeToString(bytes))
 	bip39 := NewBIP39ByFile("/home/gu/github/mywallet/bip39wordlist-en.txt")
 	words := bip39.GenerateWords(bytes)
 	fmt.Println(words)
