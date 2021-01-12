@@ -17,7 +17,16 @@ type BIP32Key struct {
 	childNumber []byte
 	chainCode   []byte
 	key         []byte
-	isPrivate   bool
+}
+
+// BIP32PriKey BIP32私钥
+type BIP32PriKey struct {
+	BIP32Key
+}
+
+// BIP32PubKey BIP32公钥
+type BIP32PubKey struct {
+	BIP32Key
 }
 
 // Serialize 字节序列化
@@ -45,10 +54,8 @@ func (me *BIP32Key) SerializeBase58() string {
 }
 
 // BIP32NewRootPriKey 构造函数，构造根私钥
-func BIP32NewRootPriKey(seed []byte) *BIP32Key {
-	rst := &BIP32Key{
-		isPrivate: true,
-	}
+func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
+	rst := &BIP32PriKey{}
 	h := hmac.New(sha512.New, []byte("Bitcoin seed"))
 	_, err := h.Write(seed)
 	if err != nil {
