@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	bip39 := NewBIP39ByFile("bip39wordlist-en.txt")
+	bip39 := NewBIP39ByFile("/home/gu/github/mywallet/bip39wordlist-en.txt")
 	words := bip39.GenerateWords(bytes)
 	fmt.Println(words)
 	seed := BIP39GetSeed(words, "")
