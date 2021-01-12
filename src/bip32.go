@@ -9,16 +9,6 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 )
 
-// BIP32Key bip32标准的key结构
-type BIP32Key struct {
-	version     []byte
-	depth       byte
-	fingerPrint []byte
-	childNumber []byte
-	chainCode   []byte
-	key         []byte
-}
-
 // BIP32PriKey BIP32私钥
 type BIP32PriKey struct {
 	BIP32Key
