@@ -1,11 +1,10 @@
 package main
 
 import (
-	"crypto/ecdsa"
 	"crypto/hmac"
 	"crypto/sha512"
 
-	"github.com/ethereum/go-ethereum/crypto"
+	btcutil "github.com/FactomProject/btcutilecc"
 )
 
 // BIP32PriKey BIP32私钥
@@ -21,16 +20,10 @@ func (me *BIP32PriKey) PublicKey() *BIP32PubKey {
 	rst.BIP32KeyCom.fingerPrint = me.fingerPrint
 	rst.BIP32KeyCom.childNumber = me.childNumber
 	rst.BIP32KeyCom.chainCode = me.chainCode
-
-	// 椭圆曲线加密
-	priKey, err := crypto.ToECDSA(me.key)
-	if err != nil {
-		panic(err)
-	}
-	pubKey := priKey.Public().(*ecdsa.PublicKey)
-	pubKeyBytes := crypto.FromECDSAPub(pubKey)[1:]
-
-	rst.BIP32KeyCom.key = append([]byte{0x03}, pubKeyBytes[:32]...)
+	// 根据私钥生成公钥的椭圆曲线坐标点
+	curve := btcutil.Secp256k1()
+	rst.x, rst.y = curve.ScalarBaseMult(me.key)
+	rst.BIP32KeyCom.key = append(rst.x.Bytes(), rst.y.Bytes()...)
 	rst.BIP32KeyCom.me = rst
 	return rst
 }
