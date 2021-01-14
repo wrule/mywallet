@@ -5,7 +5,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha512"
 
-	btcutil "github.com/FactomProject/btcutilecc"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -15,18 +14,16 @@ type BIP32PriKey struct {
 	*ecdsa.PrivateKey
 }
 
-// PublicKey 获取公钥
-func (me *BIP32PriKey) PublicKey() *BIP32PubKey {
+// BIP32PublicKey 获取BIP32公钥
+func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	rst := &BIP32PubKey{}
 	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xb2, 0x1e}
 	rst.BIP32KeyCom.depth = me.depth
 	rst.BIP32KeyCom.fingerPrint = me.fingerPrint
 	rst.BIP32KeyCom.childNumber = me.childNumber
 	rst.BIP32KeyCom.chainCode = me.chainCode
-	// 根据私钥生成公钥的椭圆曲线坐标点
-	curve := btcutil.Secp256k1()
-	rst.x, rst.y = curve.ScalarBaseMult(me.key)
-	rst.BIP32KeyCom.key = append(rst.x.Bytes(), rst.y.Bytes()...)
+	rst.PublicKey = me.PrivateKey.Public().(*ecdsa.PublicKey)
+	rst.BIP32KeyCom.key = crypto.FromECDSAPub(rst.PublicKey)
 	rst.BIP32KeyCom.me = rst
 	return rst
 }
