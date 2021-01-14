@@ -30,7 +30,7 @@ func main() {
 	fmt.Println(hex.EncodeToString(rootPriKey.Key))
 
 	myRootPriKey := BIP32NewRootPriKey(seed)
-	fmt.Println(myRootPriKey.SerializeBase58())
+	fmt.Println(myRootPriKey.BIP32Base58())
 	fmt.Println(myRootPriKey.Hex())
 	// fmt.Println(myRootPriKey.BIP32PublicKey().SerializeBase58(), len(myRootPriKey.BIP32PublicKey().Key()))
 	return
