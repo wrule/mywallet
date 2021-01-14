@@ -54,3 +54,8 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	}
 	return rst
 }
+
+// BIP32Base58 s
+func (me *BIP32PriKey) BIP32Base58() string {
+	return ""
+}

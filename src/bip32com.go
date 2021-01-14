@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/hex"
 
 	"github.com/btcsuite/btcutil/base58"
 )
@@ -40,6 +41,11 @@ func (me *BIP32KeyCom) Serialize() []byte {
 // SerializeBase58 字节序列化后转为base58编码
 func (me *BIP32KeyCom) SerializeBase58() string {
 	return base58.Encode(me.Serialize())
+}
+
+// Hex s
+func (me *BIP32KeyCom) Hex() string {
+	return hex.EncodeToString(me.key)
 }
 
 // Version s
