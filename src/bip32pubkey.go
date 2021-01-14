@@ -1,12 +1,16 @@
 package main
 
-import "math/big"
+import (
+	"crypto/ecdsa"
+	"math/big"
+)
 
 // BIP32PubKey BIP32公钥
 type BIP32PubKey struct {
 	x *big.Int
 	y *big.Int
 	BIP32KeyCom
+	*ecdsa.PublicKey
 }
 
 // X x坐标点

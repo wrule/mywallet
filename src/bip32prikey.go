@@ -1,15 +1,18 @@
 package main
 
 import (
+	"crypto/ecdsa"
 	"crypto/hmac"
 	"crypto/sha512"
 
 	btcutil "github.com/FactomProject/btcutilecc"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // BIP32PriKey BIP32私钥
 type BIP32PriKey struct {
 	BIP32KeyCom
+	*ecdsa.PrivateKey
 }
 
 // PublicKey 获取公钥
@@ -31,12 +34,14 @@ func (me *BIP32PriKey) PublicKey() *BIP32PubKey {
 // BIP32NewRootPriKey 构造函数，构造根私钥
 func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	rst := &BIP32PriKey{}
+	// HMACSHA256计算种子的hash
 	h := hmac.New(sha512.New, []byte("Bitcoin seed"))
 	_, err := h.Write(seed)
 	if err != nil {
 		panic(err)
 	}
 	hrst := h.Sum(nil)
+	// 填充根私钥匙初始化数据
 	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
 	rst.BIP32KeyCom.depth = 0x00
 	rst.BIP32KeyCom.fingerPrint = []byte{0x00, 0x00, 0x00, 0x00}
@@ -45,5 +50,10 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	// 需要校验？
 	rst.BIP32KeyCom.key = hrst[:32]
 	rst.BIP32KeyCom.me = rst
+	// 利用以太坊的库计算出ecdsa.PrivateKey
+	rst.PrivateKey, err = crypto.ToECDSA(rst.BIP32KeyCom.key)
+	if err != nil {
+		panic(err)
+	}
 	return rst
 }
