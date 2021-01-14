@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -26,7 +27,7 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	rst.BIP32KeyCom.childNumber = me.childNumber
 	rst.BIP32KeyCom.chainCode = me.chainCode
 	rst.PublicKey = me.PrivateKey.Public().(*ecdsa.PublicKey)
-	rst.BIP32KeyCom.key = crypto.FromECDSAPub(rst.PublicKey)
+	rst.BIP32KeyCom.key = elliptic.Marshal(crypto.S256(), rst.PublicKey.X, rst.PublicKey.Y)
 	rst.BIP32KeyCom.me = rst
 	return rst
 }
