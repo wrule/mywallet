@@ -7,7 +7,7 @@ import (
 	"github.com/tyler-smith/go-bip32"
 )
 
-func main() {
+func amain() {
 	bytes, err := hex.DecodeString("0c1e24e5917779d297e14d45f14e1a1a")
 	if err != nil {
 		panic(err)
