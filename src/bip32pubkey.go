@@ -46,3 +46,7 @@ func (me *BIP32PubKey) BIP32Base58() string {
 	rst = append(rst, hash2[:4]...)
 	return base58.Encode(rst)
 }
+
+func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
+	return nil
+}

@@ -53,6 +53,10 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	return rst
 }
 
+func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
+	return nil
+}
+
 // BIP32NewRootPriKey 构造函数，构造BIP32根私钥
 func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	rst := &BIP32PriKey{}

@@ -9,4 +9,5 @@ type IBIP32Key interface {
 	ChainCode() []byte
 	Key() []byte
 	BIP32Base58() string
+	ChildKey(index uint32) IBIP32Key
 }
