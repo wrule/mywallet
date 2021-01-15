@@ -16,6 +16,11 @@ type BIP32PubKey struct {
 	*ecdsa.PublicKey
 }
 
+// Key 原始公钥数据
+func (me *BIP32PubKey) Key() []byte {
+	return me.KeyUnComp()[1:]
+}
+
 // KeyComp 压缩的公钥
 func (me *BIP32PubKey) KeyComp() []byte {
 	return elliptic.MarshalCompressed(crypto.S256(), me.X, me.Y)

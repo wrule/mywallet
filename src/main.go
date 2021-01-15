@@ -1,12 +1,9 @@
 package main
 
 import (
-	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 
-	btcutil "github.com/FactomProject/btcutilecc"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/tyler-smith/go-bip32"
 )
 
@@ -28,27 +25,9 @@ func main() {
 	fmt.Println(rootPubKey.B58Serialize())
 
 	myRootPriKey := BIP32NewRootPriKey(seed)
+	fmt.Println(myRootPriKey.Hex())
 	fmt.Println(myRootPriKey.BIP32Base58())
 	myRootPubKey := myRootPriKey.BIP32PublicKey()
+	fmt.Println(myRootPubKey.Hex())
 	fmt.Println(myRootPubKey.BIP32Base58())
-	// fmt.Println(myRootPriKey.BIP32PublicKey().SerializeBase58(), len(myRootPriKey.BIP32PublicKey().Key()))
-	return
-
-	// 测试代码
-	curve := btcutil.Secp256k1()
-	x, y := curve.ScalarBaseMult(myRootPriKey.Key())
-	xBytes := x.Bytes()
-	yBytes := y.Bytes()
-	fmt.Println(hex.EncodeToString(xBytes), len(xBytes))
-	fmt.Println(hex.EncodeToString(yBytes), len(yBytes))
-	ePriKey, err := crypto.ToECDSA(myRootPriKey.Key())
-	if err != nil {
-		panic(err)
-	}
-	ePriKeyBytes := crypto.FromECDSA(ePriKey)
-	fmt.Println(hex.EncodeToString(ePriKeyBytes))
-	fmt.Println(hex.EncodeToString(myRootPriKey.Key()))
-	ePubKey := ePriKey.Public().(*ecdsa.PublicKey)
-	ePubKeyBytes := crypto.FromECDSAPub(ePubKey)[1:]
-	fmt.Println(hex.EncodeToString(ePubKeyBytes))
 }

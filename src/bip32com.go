@@ -1,8 +1,6 @@
 package main
 
-import (
-	"encoding/hex"
-)
+import "encoding/hex"
 
 // BIP32KeyCom BIP32钥匙共用实现
 type BIP32KeyCom struct {
@@ -11,13 +9,12 @@ type BIP32KeyCom struct {
 	fingerPrint []byte
 	childNumber []byte
 	chainCode   []byte
-	key         []byte
 	me          IBIP32Key
 }
 
-// Hex s
+// Hex 十六进制显示原始数据
 func (me *BIP32KeyCom) Hex() string {
-	return hex.EncodeToString(me.key)
+	return hex.EncodeToString(me.Me().Key())
 }
 
 // Version s
@@ -43,11 +40,6 @@ func (me *BIP32KeyCom) ChildNumber() []byte {
 // ChainCode s
 func (me *BIP32KeyCom) ChainCode() []byte {
 	return me.chainCode
-}
-
-// Key s
-func (me *BIP32KeyCom) Key() []byte {
-	return me.key
 }
 
 // Me s
