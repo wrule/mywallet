@@ -55,6 +55,10 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 
 // ChildKey s
 func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
+	// 如果是强化密钥
+	if IsHardenedKeyIndex(index) {
+
+	}
 	return nil
 }
 
