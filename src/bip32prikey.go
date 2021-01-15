@@ -23,6 +23,23 @@ func (me *BIP32PriKey) Key() []byte {
 	return me.key
 }
 
+// BIP32Base58 s
+func (me *BIP32PriKey) BIP32Base58() string {
+	buf := new(bytes.Buffer)
+	buf.Write(me.version)
+	buf.WriteByte(me.depth)
+	buf.Write(me.fingerPrint)
+	buf.Write(me.childNumber)
+	buf.Write(me.chainCode)
+	buf.WriteByte(0x00)
+	buf.Write(me.key)
+	rst := buf.Bytes()
+	hash1 := sha256.Sum256(rst)
+	hash2 := sha256.Sum256(hash1[:])
+	rst = append(rst, hash2[:4]...)
+	return base58.Encode(rst)
+}
+
 // BIP32PublicKey 获取BIP32公钥
 func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	rst := &BIP32PubKey{}
@@ -61,21 +78,4 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 		panic(err)
 	}
 	return rst
-}
-
-// BIP32Base58 s
-func (me *BIP32PriKey) BIP32Base58() string {
-	buf := new(bytes.Buffer)
-	buf.Write(me.version)
-	buf.WriteByte(me.depth)
-	buf.Write(me.fingerPrint)
-	buf.Write(me.childNumber)
-	buf.Write(me.chainCode)
-	buf.WriteByte(0x00)
-	buf.Write(me.key)
-	rst := buf.Bytes()
-	hash1 := sha256.Sum256(rst)
-	hash2 := sha256.Sum256(hash1[:])
-	rst = append(rst, hash2[:4]...)
-	return base58.Encode(rst)
 }
