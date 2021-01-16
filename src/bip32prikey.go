@@ -3,9 +3,10 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/sha512"
+	"encoding/binary"
+	"encoding/hex"
+	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -55,23 +56,30 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 
 // ChildKey s
 func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
+	indexBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(indexBytes, index)
+	data := []byte{}
 	// 如果是强化密钥
 	if IsHardenedKeyIndex(index) {
-
+		data = append([]byte{0x00}, me.key...)
+	} else {
+		data = append(data, me.BIP32PublicKey().KeyComp()...)
 	}
-	return nil
+	data = append(data, indexBytes...)
+	dataHash := HMACSHA512(data, me.chainCode)
+	fmt.Println(hex.EncodeToString(dataHash))
+	rst := &BIP32PriKey{}
+	rst.BIP32KeyCom.childNumber = indexBytes
+	rst.BIP32KeyCom.depth = me.depth + 1
+	rst.BIP32KeyCom.chainCode = dataHash[32:]
+	return rst
 }
 
 // BIP32NewRootPriKey 构造函数，构造BIP32根私钥
 func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	rst := &BIP32PriKey{}
-	// HMACSHA256计算种子的hash
-	h := hmac.New(sha512.New, []byte("Bitcoin seed"))
-	_, err := h.Write(seed)
-	if err != nil {
-		panic(err)
-	}
-	hrst := h.Sum(nil)
+	// HMACSHA512计算种子的hash
+	hrst := HMACSHA512(seed, []byte("Bitcoin seed"))
 	// 填充根私钥匙初始化数据
 	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
 	rst.BIP32KeyCom.depth = 0x00
@@ -82,9 +90,10 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	// 需要校验？
 	rst.key = hrst[:32]
 	// 利用以太坊的库计算出ecdsa.PrivateKey
-	rst.PrivateKey, err = crypto.ToECDSA(rst.key)
+	priKey, err := crypto.ToECDSA(rst.key)
 	if err != nil {
 		panic(err)
 	}
+	rst.PrivateKey = priKey
 	return rst
 }

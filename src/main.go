@@ -30,20 +30,21 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(childPriKey1.B58Serialize())
-	// 从主公钥派生子公钥
-	childPubKey1, err := rootPubKey.NewChildKey(0)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(childPubKey1.B58Serialize())
-	// 从子私钥派生子公钥
-	childPubKeyH1 := childPriKey1.PublicKey()
-	fmt.Println(childPubKeyH1.B58Serialize())
 
-	// myRootPriKey := BIP32NewRootPriKey(seed)
-	// fmt.Println(myRootPriKey.Hex())
+	// // 从主公钥派生子公钥
+	// childPubKey1, err := rootPubKey.NewChildKey(0)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(childPubKey1.B58Serialize())
+	// // 从子私钥派生子公钥
+	// childPubKeyH1 := childPriKey1.PublicKey()
+	// fmt.Println(childPubKeyH1.B58Serialize())
+
+	myRootPriKey := BIP32NewRootPriKey(seed)
+	a := myRootPriKey.ChildKey(0)
+	fmt.Println(a)
 	// fmt.Println(myRootPriKey.BIP32Base58())
 	// myRootPubKey := myRootPriKey.BIP32PublicKey()
-	// fmt.Println(myRootPubKey.Hex())
 	// fmt.Println(myRootPubKey.BIP32Base58())
 }

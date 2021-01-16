@@ -49,5 +49,8 @@ func (me *BIP32PubKey) BIP32Base58() string {
 
 // ChildKey s
 func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
+	if IsHardenedKeyIndex(index) {
+		panic("公钥不能生成强化密钥")
+	}
 	return nil
 }
