@@ -69,6 +69,7 @@ func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	dataHash := HMACSHA512(data, me.chainCode)
 	fmt.Println(hex.EncodeToString(dataHash))
 	rst := &BIP32PriKey{}
+	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
 	rst.BIP32KeyCom.childNumber = indexBytes
 	rst.BIP32KeyCom.depth = me.depth + 1
 	rst.BIP32KeyCom.chainCode = dataHash[32:]

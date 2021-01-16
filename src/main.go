@@ -3,9 +3,21 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"io"
 
 	"github.com/tyler-smith/go-bip32"
+	"golang.org/x/crypto/ripemd160"
 )
+
+func hashRipeMD160(data []byte) []byte {
+	hasher := ripemd160.New()
+	// hasher.Write(data)
+	_, err := io.WriteString(hasher, string(data))
+	if err != nil {
+		panic(err)
+	}
+	return hasher.Sum(nil)
+}
 
 func main() {
 	bytes, err := hex.DecodeString("0c1e24e5917779d297e14d45f14e1a1a")
@@ -44,6 +56,8 @@ func main() {
 	myRootPriKey := BIP32NewRootPriKey(seed)
 	a := myRootPriKey.ChildKey(0)
 	fmt.Println(a)
+
+	fmt.Println(hex.EncodeToString(hashRipeMD160([]byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06})))
 	// fmt.Println(myRootPriKey.BIP32Base58())
 	// myRootPubKey := myRootPriKey.BIP32PublicKey()
 	// fmt.Println(myRootPubKey.BIP32Base58())
