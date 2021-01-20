@@ -73,6 +73,7 @@ func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	rst.BIP32KeyCom.childNumber = indexBytes
 	rst.BIP32KeyCom.depth = me.depth + 1
 	rst.BIP32KeyCom.chainCode = dataHash[32:]
+	rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
 	return rst
 }
 

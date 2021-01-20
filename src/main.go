@@ -42,6 +42,7 @@ func main() {
 	// fmt.Println(childPubKeyH1.B58Serialize())
 
 	myRootPriKey := BIP32NewRootPriKey(seed)
+	myRootPriKey.ChildKey(0)
 	fmt.Println(myRootPriKey.BIP32Base58())
 	// myRootPubKey := myRootPriKey.BIP32PublicKey()
 	// fmt.Println(myRootPubKey.BIP32Base58())
