@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -74,6 +75,21 @@ func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	rst.BIP32KeyCom.depth = me.depth + 1
 	rst.BIP32KeyCom.chainCode = dataHash[32:]
 	rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
+	return rst
+}
+
+func priKeyBytesAdd(key1 []byte, key2 []byte) []byte {
+	var key1Int big.Int
+	var key2Int big.Int
+	key1Int.SetBytes(key1)
+	key2Int.SetBytes(key2)
+	key1Int.Add(&key1Int, &key2Int)
+	key1Int.Mod(&key1Int, curve.Params().N)
+	rst := key1Int.Bytes()
+	if len(rst) < 32 {
+		extra := make([]byte, 32-len(rst))
+		rst = append(extra, rst...)
+	}
 	return rst
 }
 
