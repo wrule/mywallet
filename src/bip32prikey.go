@@ -84,6 +84,7 @@ func priKeyBytesAdd(key1 []byte, key2 []byte) []byte {
 	key1Int.SetBytes(key1)
 	key2Int.SetBytes(key2)
 	key1Int.Add(&key1Int, &key2Int)
+	// curve是它自己实现的曲线，名为KoblitzCurve
 	key1Int.Mod(&key1Int, curve.Params().N)
 	rst := key1Int.Bytes()
 	if len(rst) < 32 {
