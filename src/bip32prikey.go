@@ -11,6 +11,7 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 )
 
 // BIP32PriKey BIP32私钥
@@ -75,10 +76,13 @@ func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	rst.BIP32KeyCom.depth = me.depth + 1
 	rst.BIP32KeyCom.chainCode = dataHash[32:]
 	rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
+	rst.key = addPriKeyBytes(dataHash[:32], me.key)
+	rst.BIP32KeyCom.me = rst
 	return rst
 }
 
-func priKeyBytesAdd(key1 []byte, key2 []byte) []byte {
+// addPriKeyBytes 私钥字节相加
+func addPriKeyBytes(key1 []byte, key2 []byte) []byte {
 	var key1Int big.Int
 	var key2Int big.Int
 	key1Int.SetBytes(key1)
@@ -86,7 +90,7 @@ func priKeyBytesAdd(key1 []byte, key2 []byte) []byte {
 	key1Int.Add(&key1Int, &key2Int)
 	// curve是它自己实现的曲线，名为KoblitzCurve
 	// 原来就是S256啊
-	key1Int.Mod(&key1Int, curve.Params().N)
+	key1Int.Mod(&key1Int, secp256k1.S256().Params().N)
 	rst := key1Int.Bytes()
 	if len(rst) < 32 {
 		extra := make([]byte, 32-len(rst))
@@ -95,20 +99,22 @@ func priKeyBytesAdd(key1 []byte, key2 []byte) []byte {
 	return rst
 }
 
-// BIP32NewRootPriKey 构造函数，构造BIP32根私钥
-func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
+// BIP32NewPriKey 构造函数
+func BIP32NewPriKey(
+	depth byte,
+	fingerPrint []byte,
+	childNumber []byte,
+	chainCode []byte,
+	key []byte,
+) *BIP32PriKey {
 	rst := &BIP32PriKey{}
-	// HMACSHA512计算种子的hash
-	hrst := HMACSHA512(seed, []byte("Bitcoin seed"))
-	// 填充根私钥匙初始化数据
 	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
-	rst.BIP32KeyCom.depth = 0x00
-	rst.BIP32KeyCom.fingerPrint = []byte{0x00, 0x00, 0x00, 0x00}
-	rst.BIP32KeyCom.childNumber = []byte{0x00, 0x00, 0x00, 0x00}
-	rst.BIP32KeyCom.chainCode = hrst[32:]
+	rst.BIP32KeyCom.depth = depth
+	rst.BIP32KeyCom.fingerPrint = fingerPrint
+	rst.BIP32KeyCom.childNumber = childNumber
+	rst.BIP32KeyCom.chainCode = chainCode
 	rst.BIP32KeyCom.me = rst
-	// 需要校验？
-	rst.key = hrst[:32]
+	rst.key = key
 	// 利用以太坊的库计算出ecdsa.PrivateKey
 	priKey, err := crypto.ToECDSA(rst.key)
 	if err != nil {
@@ -116,4 +122,34 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 	}
 	rst.PrivateKey = priKey
 	return rst
+}
+
+// BIP32NewRootPriKey 构造函数，构造BIP32根私钥
+func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
+	// rst := &BIP32PriKey{}
+	// HMACSHA512计算种子的hash
+	hrst := HMACSHA512(seed, []byte("Bitcoin seed"))
+	return BIP32NewPriKey(
+		0x00,
+		[]byte{0x00, 0x00, 0x00, 0x00},
+		[]byte{0x00, 0x00, 0x00, 0x00},
+		hrst[32:],
+		hrst[:32],
+	)
+	// // 填充根私钥匙初始化数据
+	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
+	// rst.BIP32KeyCom.depth = 0x00
+	// rst.BIP32KeyCom.fingerPrint = []byte{0x00, 0x00, 0x00, 0x00}
+	// rst.BIP32KeyCom.childNumber = []byte{0x00, 0x00, 0x00, 0x00}
+	// rst.BIP32KeyCom.chainCode = hrst[32:]
+	// rst.BIP32KeyCom.me = rst
+	// // 需要校验？
+	// rst.key = hrst[:32]
+	// // 利用以太坊的库计算出ecdsa.PrivateKey
+	// priKey, err := crypto.ToECDSA(rst.key)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// rst.PrivateKey = priKey
+	// return rst
 }
