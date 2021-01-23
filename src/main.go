@@ -28,9 +28,14 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(childPriKey.B58Serialize())
+
+	fmt.Println()
+
 	// s
 	myRootPriKey := BIP32NewRootPriKey(seed)
 	fmt.Println(myRootPriKey.BIP32Base58())
+	myRootPubKey := myRootPriKey.BIP32PublicKey()
+	fmt.Println(myRootPubKey.BIP32Base58())
 	myChildPriKey := myRootPriKey.ChildKey(0x80000001)
 	fmt.Println(myChildPriKey.BIP32Base58())
 }

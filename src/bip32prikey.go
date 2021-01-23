@@ -43,14 +43,40 @@ func (me *BIP32PriKey) BIP32Base58() string {
 
 // BIP32PublicKey 获取BIP32公钥
 func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
+	return BIP32NewPubKey(
+		me.depth,
+		me.fingerPrint,
+		me.childNumber,
+		me.chainCode,
+		me.PrivateKey.Public().(*ecdsa.PublicKey),
+	)
+	// rst := &BIP32PubKey{}
+	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xb2, 0x1e}
+	// rst.BIP32KeyCom.depth = me.depth
+	// rst.BIP32KeyCom.fingerPrint = me.fingerPrint
+	// rst.BIP32KeyCom.childNumber = me.childNumber
+	// rst.BIP32KeyCom.chainCode = me.chainCode
+	// rst.PublicKey = me.PrivateKey.Public().(*ecdsa.PublicKey)
+	// rst.BIP32KeyCom.me = rst
+	// return rst
+}
+
+// BIP32NewPubKey 构造函数
+func BIP32NewPubKey(
+	depth byte,
+	fingerPrint []byte,
+	childNumber []byte,
+	chainCode []byte,
+	PublicKey *ecdsa.PublicKey,
+) *BIP32PubKey {
 	rst := &BIP32PubKey{}
 	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xb2, 0x1e}
-	rst.BIP32KeyCom.depth = me.depth
-	rst.BIP32KeyCom.fingerPrint = me.fingerPrint
-	rst.BIP32KeyCom.childNumber = me.childNumber
-	rst.BIP32KeyCom.chainCode = me.chainCode
-	rst.PublicKey = me.PrivateKey.Public().(*ecdsa.PublicKey)
+	rst.BIP32KeyCom.depth = depth
+	rst.BIP32KeyCom.fingerPrint = fingerPrint
+	rst.BIP32KeyCom.childNumber = childNumber
+	rst.BIP32KeyCom.chainCode = chainCode
 	rst.BIP32KeyCom.me = rst
+	rst.PublicKey = PublicKey
 	return rst
 }
 
@@ -91,8 +117,8 @@ func addPriKeyBytes(key1 []byte, key2 []byte) []byte {
 	key1Int.SetBytes(key1)
 	key2Int.SetBytes(key2)
 	key1Int.Add(&key1Int, &key2Int)
-	// curve是它自己实现的曲线，名为KoblitzCurve
-	// 原来就是S256啊
+	// curve是自己实现的曲线，名为KoblitzCurve
+	// 原来就是S256
 	key1Int.Mod(&key1Int, secp256k1.S256().Params().N)
 	rst := key1Int.Bytes()
 	if len(rst) < 32 {
