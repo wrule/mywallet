@@ -54,11 +54,16 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	return rst
 }
 
+func uint32Bytes(num uint32) []byte {
+	rst := make([]byte, 4)
+	binary.BigEndian.PutUint32(rst, num)
+	return rst
+}
+
 // ChildKey s
 func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	// 计算出index的uint32大端字节
-	indexBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(indexBytes, index)
+	indexBytes := uint32Bytes(index)
 	// 计算密钥data
 	data := []byte{}
 	if IsHardenedKeyIndex(index) {
@@ -77,15 +82,6 @@ func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 		dataHashBytes[32:],
 		addPriKeyBytes(dataHashBytes[:32], me.key),
 	)
-	// rst := &BIP32PriKey{}
-	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
-	// rst.BIP32KeyCom.childNumber = indexBytes
-	// rst.BIP32KeyCom.depth = me.depth + 1
-	// rst.BIP32KeyCom.chainCode = dataHash[32:]
-	// rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
-	// rst.key = addPriKeyBytes(dataHash[:32], me.key)
-	// rst.BIP32KeyCom.me = rst
-	// return rst
 }
 
 // addPriKeyBytes 私钥字节相加
