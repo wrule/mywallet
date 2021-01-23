@@ -5,8 +5,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/binary"
-	"encoding/hex"
-	"fmt"
 	"math/big"
 
 	"github.com/btcsuite/btcutil/base58"
@@ -58,27 +56,36 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 
 // ChildKey s
 func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
+	// 计算出index的uint32大端字节
 	indexBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(indexBytes, index)
+	// 计算密钥data
 	data := []byte{}
-	// 如果是强化密钥
 	if IsHardenedKeyIndex(index) {
-		data = append([]byte{0x00}, me.key...)
+		data = append(data, 0x00)
+		data = append(data, me.key...)
 	} else {
 		data = append(data, me.BIP32PublicKey().KeyComp()...)
 	}
 	data = append(data, indexBytes...)
-	dataHash := HMACSHA512(data, me.chainCode)
-	fmt.Println(hex.EncodeToString(dataHash))
-	rst := &BIP32PriKey{}
-	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
-	rst.BIP32KeyCom.childNumber = indexBytes
-	rst.BIP32KeyCom.depth = me.depth + 1
-	rst.BIP32KeyCom.chainCode = dataHash[32:]
-	rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
-	rst.key = addPriKeyBytes(dataHash[:32], me.key)
-	rst.BIP32KeyCom.me = rst
-	return rst
+	dataHashBytes := HMACSHA512(data, me.chainCode)
+	// 生成子私钥
+	return BIP32NewPriKey(
+		me.depth+1,
+		RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4],
+		indexBytes,
+		dataHashBytes[32:],
+		addPriKeyBytes(dataHashBytes[:32], me.key),
+	)
+	// rst := &BIP32PriKey{}
+	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
+	// rst.BIP32KeyCom.childNumber = indexBytes
+	// rst.BIP32KeyCom.depth = me.depth + 1
+	// rst.BIP32KeyCom.chainCode = dataHash[32:]
+	// rst.BIP32KeyCom.fingerPrint = RipeMD160(Sha256(me.BIP32PublicKey().KeyComp()))[:4]
+	// rst.key = addPriKeyBytes(dataHash[:32], me.key)
+	// rst.BIP32KeyCom.me = rst
+	// return rst
 }
 
 // addPriKeyBytes 私钥字节相加
@@ -126,7 +133,6 @@ func BIP32NewPriKey(
 
 // BIP32NewRootPriKey 构造函数，构造BIP32根私钥
 func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
-	// rst := &BIP32PriKey{}
 	// HMACSHA512计算种子的hash
 	hrst := HMACSHA512(seed, []byte("Bitcoin seed"))
 	return BIP32NewPriKey(
@@ -136,20 +142,4 @@ func BIP32NewRootPriKey(seed []byte) *BIP32PriKey {
 		hrst[32:],
 		hrst[:32],
 	)
-	// // 填充根私钥匙初始化数据
-	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xad, 0xe4}
-	// rst.BIP32KeyCom.depth = 0x00
-	// rst.BIP32KeyCom.fingerPrint = []byte{0x00, 0x00, 0x00, 0x00}
-	// rst.BIP32KeyCom.childNumber = []byte{0x00, 0x00, 0x00, 0x00}
-	// rst.BIP32KeyCom.chainCode = hrst[32:]
-	// rst.BIP32KeyCom.me = rst
-	// // 需要校验？
-	// rst.key = hrst[:32]
-	// // 利用以太坊的库计算出ecdsa.PrivateKey
-	// priKey, err := crypto.ToECDSA(rst.key)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// rst.PrivateKey = priKey
-	// return rst
 }
