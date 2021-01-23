@@ -18,6 +18,9 @@ func main() {
 	fmt.Println(words)
 	seed := BIP39GetSeed(words, "")
 	fmt.Println(hex.EncodeToString(seed))
+
+	fmt.Println()
+
 	// 生成主私钥，主公钥，以及子密钥
 	rootPriKey, _ := bip32.NewMasterKey(seed)
 	rootPubKey := rootPriKey.PublicKey()
