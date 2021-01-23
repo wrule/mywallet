@@ -60,7 +60,7 @@ func uint32Bytes(num uint32) []byte {
 	return rst
 }
 
-// ChildKey s
+// ChildKey 私钥生成子私钥
 func (me *BIP32PriKey) ChildKey(index uint32) IBIP32Key {
 	// 计算出index的uint32大端字节
 	indexBytes := uint32Bytes(index)
