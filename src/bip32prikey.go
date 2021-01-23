@@ -50,15 +50,6 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 		me.chainCode,
 		me.PrivateKey.Public().(*ecdsa.PublicKey),
 	)
-	// rst := &BIP32PubKey{}
-	// rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xb2, 0x1e}
-	// rst.BIP32KeyCom.depth = me.depth
-	// rst.BIP32KeyCom.fingerPrint = me.fingerPrint
-	// rst.BIP32KeyCom.childNumber = me.childNumber
-	// rst.BIP32KeyCom.chainCode = me.chainCode
-	// rst.PublicKey = me.PrivateKey.Public().(*ecdsa.PublicKey)
-	// rst.BIP32KeyCom.me = rst
-	// return rst
 }
 
 // BIP32NewPubKey 构造函数
