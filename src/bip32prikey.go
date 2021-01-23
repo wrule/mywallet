@@ -52,25 +52,6 @@ func (me *BIP32PriKey) BIP32PublicKey() *BIP32PubKey {
 	)
 }
 
-// BIP32NewPubKey 构造函数
-func BIP32NewPubKey(
-	depth byte,
-	fingerPrint []byte,
-	childNumber []byte,
-	chainCode []byte,
-	PublicKey *ecdsa.PublicKey,
-) *BIP32PubKey {
-	rst := &BIP32PubKey{}
-	rst.BIP32KeyCom.version = []byte{0x04, 0x88, 0xb2, 0x1e}
-	rst.BIP32KeyCom.depth = depth
-	rst.BIP32KeyCom.fingerPrint = fingerPrint
-	rst.BIP32KeyCom.childNumber = childNumber
-	rst.BIP32KeyCom.chainCode = chainCode
-	rst.BIP32KeyCom.me = rst
-	rst.PublicKey = PublicKey
-	return rst
-}
-
 func uint32Bytes(num uint32) []byte {
 	rst := make([]byte, 4)
 	binary.BigEndian.PutUint32(rst, num)
