@@ -31,6 +31,11 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(childPriKey.B58Serialize())
+	childPubKey, err := rootPubKey.NewChildKey(0)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(childPubKey.B58Serialize())
 
 	fmt.Println()
 
@@ -41,4 +46,6 @@ func main() {
 	fmt.Println(myRootPubKey.BIP32Base58())
 	myChildPriKey := myRootPriKey.ChildKey(0x80000001)
 	fmt.Println(myChildPriKey.BIP32Base58())
+	myChildPubKey := myRootPubKey.ChildKey(0)
+	fmt.Println(myChildPubKey.BIP32Base58())
 }

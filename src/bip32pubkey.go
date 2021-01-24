@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
+	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -54,14 +55,17 @@ func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
 		indexBytes := uint32Bytes(index)
 		// 计算密钥data
 		data := []byte{}
-		if IsHardenedKeyIndex(index) {
-			data = append(data, 0x00)
-			data = append(data, me.key...)
-		} else {
-			data = append(data, me.BIP32PublicKey().KeyComp()...)
-		}
+		data = append(data, me.KeyComp()...)
 		data = append(data, indexBytes...)
 		dataHashBytes := HMACSHA512(data, me.chainCode)
+		fmt.Println(dataHashBytes)
+		return BIP32NewPubKey(
+			me.depth+1,
+			RipeMD160(Sha256(me.KeyComp()))[:4],
+			indexBytes,
+			dataHashBytes[32:],
+			nil,
+		)
 	} else {
 		panic("公钥不能生成强化密钥")
 	}
