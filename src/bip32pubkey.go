@@ -5,9 +5,11 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
+	"fmt"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 )
 
 // BIP32PubKey BIP32公钥
@@ -57,6 +59,14 @@ func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
 		data = append(data, me.KeyComp()...)
 		data = append(data, indexBytes...)
 		dataHashBytes := HMACSHA512(data, me.chainCode)
+
+		keyBytes := secp256k1.CompressPubkey(
+			secp256k1.S256().ScalarBaseMult(dataHashBytes[:32]),
+		)
+
+		testKey := addPubKeyBytes(keyBytes, me.KeyComp())
+		fmt.Println(testKey)
+
 		rst := BIP32NewPubKey(
 			me.depth+1,
 			RipeMD160(Sha256(me.KeyComp()))[:4],
@@ -67,6 +77,13 @@ func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
 		return rst
 	}
 	panic("公钥不能生成强化密钥")
+}
+
+// addPubKeyBytes 私钥字节相加
+func addPubKeyBytes(key1 []byte, key2 []byte) []byte {
+	x1, y1 := secp256k1.DecompressPubkey(key1)
+	x2, y2 := secp256k1.DecompressPubkey(key2)
+	return secp256k1.CompressPubkey(secp256k1.S256().Add(x1, y1, x2, y2))
 }
 
 // BIP32NewPubKey 构造函数
