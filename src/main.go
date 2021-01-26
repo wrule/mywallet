@@ -15,8 +15,10 @@ func main() {
 	}
 	bip39 := NewBIP39ByFile("/home/gu/github/mywallet/bip39wordlist-en.txt")
 	words := bip39.GenerateWords(bytes)
+	fmt.Println("助记词")
 	fmt.Println(words)
 	seed := BIP39GetSeed(words, "")
+	fmt.Println("种子")
 	fmt.Println(hex.EncodeToString(seed))
 
 	fmt.Println()
