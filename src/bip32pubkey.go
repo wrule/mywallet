@@ -64,6 +64,8 @@ func (me *BIP32PubKey) ChildKey(index uint32) IBIP32Key {
 			secp256k1.S256().ScalarBaseMult(dataHashBytes[:32]),
 		)
 
+		// 可能需要添加一个key字段了
+		// 或者搜索(*ecdsa.PublicKey 如何根据字节生成公钥
 		testKey := addPubKeyBytes(keyBytes, me.KeyComp())
 		fmt.Println(testKey)
 
